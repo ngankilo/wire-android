@@ -21,7 +21,7 @@ import android.content.Context
 import com.waz.ZLog.ImplicitTag._
 import com.waz.api.Message
 import com.waz.api.Message.Status
-import com.waz.model.MessageData
+import com.waz.model.{LocalInstant, MessageData}
 import com.waz.service.ZMessaging
 import com.waz.service.messages.MessageAndLikes
 import com.waz.threading.CancellableFuture
@@ -90,10 +90,10 @@ class FooterViewController(implicit inj: Injector, context: Context, ec: EventCo
 
   val ephemeralTimeout: Signal[Option[FiniteDuration]] = message.map(_.expiryTime) flatMap {
     case None => Signal const None
-    case Some(expiry) if expiry <= Instant.now => Signal const None
+    case Some(expiry) if expiry <= LocalInstant.Now => Signal const None
     case Some(expiry) =>
       ClockSignal(1.second) map { now =>
-        Some(now.until(expiry).asScala).filterNot(_.isNegative)
+        Some(now.until(expiry.instant).asScala).filterNot(_.isNegative)
       }
   }
 
@@ -106,7 +106,7 @@ class FooterViewController(implicit inj: Injector, context: Context, ec: EventCo
     msg         <- message
     timeout     <- ephemeralTimeout
   } yield {
-    val timestamp = ZTimeFormatter.getSingleMessageTime(context, DateTimeUtils.toDate(msg.time))
+    val timestamp = ZTimeFormatter.getSingleMessageTime(context, DateTimeUtils.toDate(msg.time.instant))
     timeout match {
       case Some(t)                          => ephemeralTimeoutString(timestamp, t)
       case None if selfUserId == msg.userId => statusString(timestamp, msg, isGroup)

@@ -101,7 +101,7 @@ class SingleUserRowView(context: Context, attrs: AttributeSet, style: Int) exten
     if (teamId.isDefined) setAvailability(userData.availability)
     setVerified(userData.isVerified)
     val handle = userData.handle.map(h => StringUtils.formatHandle(h.string))
-    val expiration = userData.expiresAt.map(GuestUtils.timeRemainingString(_, Instant.now))
+    val expiration = userData.expiresAt.map(ea => GuestUtils.timeRemainingString(ea.instant, Instant.now))
     if (showSubtitle) setSubtitle(expiration.orElse(handle)) else subtitleView.setVisibility(View.GONE)
     setIsGuest(userData.isGuest(teamId))
   }

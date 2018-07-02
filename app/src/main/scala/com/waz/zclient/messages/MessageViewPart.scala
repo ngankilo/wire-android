@@ -102,9 +102,9 @@ trait TimeSeparator extends MessageViewPart with ViewHelper {
   lazy val timeText: TypefaceTextView = findById(R.id.separator__time)
   lazy val unreadDot: UnreadDot = findById(R.id.unread_dot)
 
-  val time = Signal[Instant]()
+  val time = Signal[RemoteInstant]()
   val text = time map { t =>
-    getSeparatorTime(getContext, LocalDateTime.now, DateConvertUtils.asLocalDateTime(t), is24HourFormat, ZoneId.systemDefault, true)
+    getSeparatorTime(getContext, LocalDateTime.now, DateConvertUtils.asLocalDateTime(t.instant), is24HourFormat, ZoneId.systemDefault, true)
   }
 
   text.on(Threading.Ui)(timeText.setTransformedText)

@@ -89,7 +89,7 @@ class ParticipantDetailsTab(val context: Context, callback: FooterMenuCallback) 
     expires <- participantsController.otherParticipant.map(_.expiresAt)
     clock   <- if (expires.isDefined) ClockSignal(5.minutes) else Signal.const(Instant.EPOCH)
   } yield expires match {
-    case Some(expiresAt) => GuestUtils.timeRemainingString(expiresAt, clock)
+    case Some(expiresAt) => GuestUtils.timeRemainingString(expiresAt.instant, clock)
     case _ => ""
   }).onUi(guestIndicatorTimer.setText)
 

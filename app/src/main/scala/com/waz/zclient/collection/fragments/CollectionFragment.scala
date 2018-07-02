@@ -221,7 +221,7 @@ class CollectionFragment extends BaseFragment[CollectionFragment.Container] with
       case (AdapterState(_, _, _), Some(messageData), _) if messageData.msgType == Message.Type.ASSET =>
         setNavigationIconVisibility(true)
         timestamp.setVisibility(View.VISIBLE)
-        timestamp.setText(LocalDateTime.ofInstant(messageData.time, ZoneId.systemDefault()).toLocalDate.toString)
+        timestamp.setText(LocalDateTime.ofInstant(messageData.time.instant, ZoneId.systemDefault()).toLocalDate.toString)
       case (_, _, query) if query.originalString.nonEmpty =>
         collectionRecyclerView.setVisibility(View.GONE)
         searchRecyclerView.setVisibility(View.VISIBLE)

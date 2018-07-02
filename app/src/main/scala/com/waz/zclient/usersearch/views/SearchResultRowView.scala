@@ -99,7 +99,7 @@ class TextSearchResultRowView(context: Context, attrs: AttributeSet, style: Int)
 
   infoSignal.on(Threading.Ui){
     case (msg, user) =>
-      val timeStr = getSeparatorTime(getContext, LocalDateTime.now, DateConvertUtils.asLocalDateTime(msg.time), DateFormat.is24HourFormat(getContext), ZoneId.systemDefault, true, false)
+      val timeStr = getSeparatorTime(getContext, LocalDateTime.now, DateConvertUtils.asLocalDateTime(msg.time.instant), DateFormat.is24HourFormat(getContext), ZoneId.systemDefault, true, false)
       infoTextView.setText(TextViewUtils.getBoldText(getContext, s"[[${user.name}]] $timeStr"))
       chatheadView.setUserId(msg.userId)
     case _ =>

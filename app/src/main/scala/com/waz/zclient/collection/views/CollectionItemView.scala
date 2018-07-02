@@ -84,7 +84,7 @@ trait CollectionNormalItemView extends CollectionItemView with ClickableViewPart
 
   messageData.on(Threading.Ui) {
     md =>
-      val timeStr = getSeparatorTime(getContext, LocalDateTime.now, DateConvertUtils.asLocalDateTime(md.time), DateFormat.is24HourFormat(getContext), ZoneId.systemDefault, true, false)
+      val timeStr = getSeparatorTime(getContext, LocalDateTime.now, DateConvertUtils.asLocalDateTime(md.time.instant), DateFormat.is24HourFormat(getContext), ZoneId.systemDefault, true, false)
       messageTime.setText(timeStr)
   }
 

@@ -22,7 +22,7 @@ import com.waz.ZLog.ImplicitTag._
 import com.waz.ZLog._
 import com.waz.api.Verification
 import com.waz.avs.VideoPreview
-import com.waz.model.{AssetId, UserData, UserId}
+import com.waz.model.{AssetId, LocalInstant, UserData, UserId}
 import com.waz.service.ZMessaging.clock
 import com.waz.service.call.Avs.VideoState
 import com.waz.service.call.{CallInfo, CallingService}
@@ -113,7 +113,7 @@ class CallController(implicit inj: Injector, cxt: WireContext, eventContext: Eve
     for {
       cZms        <- callingZms
       ids         <- others.map { os =>
-        val ordered = os.toSeq.sortBy(_._2.getOrElse(Instant.EPOCH)).reverse.map(_._1)
+        val ordered = os.toSeq.sortBy(_._2.getOrElse(LocalInstant.Epoch)).reverse.map(_._1)
         take.fold(ordered)(t => ordered.take(t))
       }
       users       <- cZms.usersStorage.listSignal(ids)
@@ -193,7 +193,7 @@ class CallController(implicit inj: Injector, cxt: WireContext, eventContext: Eve
       true         <- isVideoCall
       Some(est)    <- currentCall.map(_.estabTime)
       (show, last) <- lastControlsClick.orElse(Signal.const((true, clock.instant())))
-      display      <- if (show) ClockSignal(3.seconds).map(c => last.max(est).until(c).asScala <= 3.seconds)
+      display      <- if (show) ClockSignal(3.seconds).map(c => last.max(est.instant).until(c).asScala <= 3.seconds)
                       else Signal.const(false)
     } yield display).orElse(Signal.const(true))
 

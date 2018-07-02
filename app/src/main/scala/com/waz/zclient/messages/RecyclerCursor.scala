@@ -22,7 +22,7 @@ import com.waz.ZLog._
 import com.waz.api.MessageFilter
 import com.waz.content.ConvMessagesIndex._
 import com.waz.content.{ConvMessagesIndex, MessagesCursor}
-import com.waz.model.{ConvId, MessageData}
+import com.waz.model.{ConvId, LocalInstant, MessageData}
 import com.waz.service.ZMessaging
 import com.waz.service.messages.MessageAndLikes
 import com.waz.threading.Threading
@@ -30,7 +30,7 @@ import com.waz.utils._
 import com.waz.utils.events.{EventContext, Signal, Subscription}
 import com.waz.zclient.messages.RecyclerCursor.RecyclerNotifier
 import com.waz.zclient.{Injectable, Injector}
-import org.threeten.bp.Instant
+import com.waz.utils.RichWireInstant
 
 import scala.concurrent.Future
 
@@ -90,11 +90,11 @@ class RecyclerCursor(val conv: ConvId, zms: ZMessaging, val adapter: RecyclerNot
     onChangedSub = Some(c.onUpdate.on(Threading.Ui) { case (prev, current) => onUpdated(prev, current) })
   }
 
-  private def notifyFromHistory(time: Instant): Unit = {
+  private def notifyFromHistory(time: LocalInstant): Unit = {
     verbose(s"notifyFromHistory($time)")
 
     history.foreach { _.updates foreach { case (prev, current) => window.onUpdated(prev, current) } }
-    history = history.filter(_.time.isAfter(time)) // leave only updates which happened after current cursor was loaded
+    history = history.filter(_.time.isAfter(time.toRemote(ZMessaging.currentBeDrift))) // leave only updates which happened after current cursor was loaded
   }
 
   private def onUpdated(prev: MessageAndLikes, current: MessageAndLikes): Unit =

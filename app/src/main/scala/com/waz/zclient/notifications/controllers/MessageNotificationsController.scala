@@ -34,12 +34,12 @@ import com.waz.api.NotificationsHandler.NotificationType._
 import com.waz.api.impl.AccentColor
 import com.waz.bitmap.BitmapUtils
 import com.waz.model._
-import com.waz.service.{AccountsService, ZMessaging}
 import com.waz.service.push.NotificationService.NotificationInfo
+import com.waz.service.{AccountsService, ZMessaging}
 import com.waz.threading.{CancellableFuture, Threading}
 import com.waz.ui.MemoryImageCache.BitmapRequest
 import com.waz.utils.events.{EventContext, Signal}
-import com.waz.utils.{returning, _}
+import com.waz.utils.returning
 import com.waz.utils.wrappers.Bitmap
 import com.waz.zclient.Intents._
 import com.waz.zclient._
@@ -322,7 +322,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     bigTextStyle.bigText(body)
     teamName.foreach(bigTextStyle.setSummaryText)
 
-    val builder = commonBuilder(userId, title, n.time, bigTextStyle, silent)
+    val builder = commonBuilder(userId, title, n.time.instant, bigTextStyle, silent)
       .setContentText(body)
       .setContentIntent(OpenConvIntent(userId, n.convId, requestBase))
       .setDeleteIntent(NotificationsAndroidService.clearNotificationsIntent(userId, n.convId, context))
@@ -372,7 +372,7 @@ class MessageNotificationsController(implicit inj: Injector, cxt: Context, event
     if (BundleEnabled)
       teamName.foreach(inboxStyle.setSummaryText)
 
-    val builder = commonBuilder(userId, title, ns.maxBy(_.time).time, inboxStyle, silent)
+    val builder = commonBuilder(userId, title, ns.maxBy(_.time).time.instant, inboxStyle, silent)
 
     if (isSingleConv)
       builder.setDeleteIntent(NotificationsAndroidService.clearNotificationsIntent(userId, convIds.head, context))

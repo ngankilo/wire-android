@@ -35,7 +35,8 @@ import com.waz.zclient.utils.ContextUtils._
 import com.waz.zclient.utils.DateConvertUtils.asZonedDateTime
 import com.waz.zclient.utils._
 import com.waz.zclient.{BuildConfig, R, ViewHelper}
-import org.threeten.bp.Instant
+import scala.concurrent.duration._
+import com.waz.utils.RichWireInstant
 
 class MessageView(context: Context, attrs: AttributeSet, style: Int)
     extends MessageViewLayout(context, attrs, style) with ViewHelper {
@@ -144,11 +145,11 @@ class MessageView(context: Context, attrs: AttributeSet, style: Int)
     case Message.Type.CONNECT_REQUEST => None
     case _ =>
       prev.fold2(None, { p =>
-        val prevDay = asZonedDateTime(p.time).toLocalDate.atStartOfDay()
-        val curDay = asZonedDateTime(msg.time).toLocalDate.atStartOfDay()
+        val prevDay = asZonedDateTime(p.time.instant).toLocalDate.atStartOfDay()
+        val curDay = asZonedDateTime(msg.time.instant).toLocalDate.atStartOfDay()
 
         if (prevDay.isBefore(curDay)) Some(SeparatorLarge)
-        else if (p.time.isBefore(msg.time.minusSeconds(1800)) || isFirstUnread) Some(Separator)
+        else if (p.time.isBefore(msg.time - 1800.seconds) || isFirstUnread) Some(Separator)
         else None
       })
   }
@@ -164,7 +165,7 @@ class MessageView(context: Context, attrs: AttributeSet, style: Int)
   private def shouldShowChathead(msg: MessageData, prev: Option[MessageData]) = {
     val userChanged = prev.forall(m => m.userId != msg.userId || systemMessage(m))
     val recalled = msg.msgType == Message.Type.RECALLED
-    val edited = msg.editTime != Instant.EPOCH
+    val edited = !msg.editTime.isEpoch
     val knock = msg.msgType == Message.Type.KNOCK
 
     !knock && !systemMessage(msg) && (recalled || edited || userChanged)

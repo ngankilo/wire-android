@@ -234,9 +234,9 @@ class CollectionAdapter(viewDim: Signal[Dim2])(implicit context: Context, inject
         }
       }
       case _ =>
-        val time = getItem(position).map(_.time).getOrElse(Instant.EPOCH)
+        val time = getItem(position).map(_.time).getOrElse(RemoteInstant.Epoch)
         val now = LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).toLocalDate
-        val messageDate = LocalDateTime.ofInstant(time, ZoneId.systemDefault()).toLocalDate()
+        val messageDate = LocalDateTime.ofInstant(time.instant, ZoneId.systemDefault()).toLocalDate()
 
         if (now == messageDate)
           Header.subToday
